@@ -22,7 +22,8 @@ import com.google.cloud.spanner.DatabaseId;
 import com.google.cloud.spanner.Spanner;
 import com.google.cloud.spanner.SpannerOptions;
 import java.io.IOException;
-import java.util.UUID;
+import java.time.format.DateTimeFormatter;
+import java.time.LocalDateTime;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
@@ -92,13 +93,15 @@ public class SpannerClient implements ServletContextListener {
         INSTANCE_ID = sc.getInitParameter("SPANNER_INSTANCE");
       }
     }
-    // try system properties
+
     if (INSTANCE_ID == null) {
       INSTANCE_ID = System.getenv("SPANNER_INSTANCE");
     }
 
     if (DATABASE_ID == null) {
-      DATABASE_ID = "db-" + UUID.randomUUID().toString().substring(0, 25);
+      // Append the current time to the database name, to avoid collisions.
+      DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss");
+      DATABASE_ID = "db_" + LocalDateTime.now().format(formatter);
     }
 
     try {

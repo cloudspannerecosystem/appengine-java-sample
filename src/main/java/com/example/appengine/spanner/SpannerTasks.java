@@ -50,7 +50,8 @@ class SpannerTasks {
     addStoringIndex,
     readStoringIndex,
     writeTransaction,
-    readOnlyTransaction
+    readOnlyTransaction,
+    dropDatabase
   }
 
   /** Class to contain singer sample data. */
@@ -380,6 +381,13 @@ class SpannerTasks {
     }
   }
 
+  private static void dropDatabase(PrintWriter pw)
+      throws InterruptedException, ExecutionException {
+    SpannerClient.getDatabaseAdminClient()
+        .dropDatabase(SpannerClient.getInstanceId(), SpannerClient.getDatabaseId());
+    pw.println("Dropped database [" + SpannerClient.getDatabaseId() + "]");
+  }
+
   static void runTask(Task task, PrintWriter pw) throws ExecutionException, InterruptedException {
     Stopwatch stopwatch = Stopwatch.createStarted();
     switch (task) {
@@ -424,6 +432,9 @@ class SpannerTasks {
         break;
       case writeTransaction:
         writeWithTransaction();
+        break;
+      case dropDatabase:
+        dropDatabase(pw);
         break;
       default:
         break;
