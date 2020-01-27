@@ -1,0 +1,68 @@
+version: 2.1
+
+orbs:
+  gcp-cli: circleci/gcp-cli@1.8.3
+
+jobs:
+  build_and_test:
+    docker:
+      - image: circleci/openjdk:11-jdk
+
+    working_directory: ~/repo
+
+    steps:
+      - checkout
+
+      - gcp-cli/install
+
+      - run:
+          name: set credentials
+          command: |
+            echo $GCLOUD_SERVICE_KEY > $HOME/gcloud-service-key.json
+            gcloud auth activate-service-account --key-file=$HOME/gcloud-service-key.json
+
+      - run:
+          name: install simple-jetty-main dependency
+          command: |
+            cd simple-jetty-main
+            mvn install
+
+      - run:
+          name: update Spanner instance
+          command: sed -i "s/<INSTANCE_ID>/$SPANNER_INSTANCE/g" src/main/appengine/app.yaml
+
+      - run:
+          name: start App Engine service
+          command: gcloud app versions start spanner --project=$GOOGLE_PROJECT_ID --quiet
+
+      - run:
+          name: deploy to App Engine
+          command: mvn package appengine:deploy -Dapp.deploy.projectId=$GOOGLE_PROJECT_ID
+
+      - run:
+          name: call endpoint and check output
+          command: |
+            curl https://$GOOGLE_PROJECT_ID.appspot.com/spanner | tee $HOME/output.html
+            grep -q "All done!" $HOME/output.html
+
+      - run:
+          name: stop App Engine service
+          command: gcloud app versions stop spanner --project=$GOOGLE_PROJECT_ID --quiet
+
+workflows:
+  version: 2
+
+  commit:  # Run on every commit.
+    jobs:
+      - build_and_test
+
+  nightly:  # Run every night.
+    triggers:
+      - schedule:
+          cron: "0 0 * * *"
+          filters:
+            branches:
+              only:
+                  - master
+    jobs:
+      - build_and_test

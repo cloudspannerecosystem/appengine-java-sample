@@ -67,6 +67,7 @@ public class SpannerTasksServlet extends HttpServlet {
       for (Task task : tasks) {
         SpannerTasks.runTask(task, pw);
       }
+      pw.println("All done!");
     } catch (Exception e) {
       e.printStackTrace(pw);
       pw.append(e.getMessage());

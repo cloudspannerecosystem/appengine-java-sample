@@ -1,4 +1,5 @@
 # App Engine Java 11 sample
+[![cloudspannerecosystem](https://circleci.com/gh/cloudspannerecosystem/appengine-java-sample.svg?style=svg)](https://circleci.com/gh/cloudspannerecosystem/appengine-java-sample)
 
 This sample demonstrates how to use Cloud Spanner from the
 [App Engine Standard with Java 11 environment](https://cloud.google.com/appengine/docs/java/).
