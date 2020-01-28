@@ -4,6 +4,9 @@
 This sample demonstrates how to use Cloud Spanner from the
 [App Engine Standard with Java 11 environment](https://cloud.google.com/appengine/docs/java/).
 
+Please feel free to report issues and send pull requests, but note that this
+application is not officially supported as part of the Cloud Spanner product.
+
 ## Prerequisites
 
 ### Create a project in the Google Cloud Platform Console
