@@ -42,6 +42,7 @@ jobs:
       - run:
           name: call endpoint and check output
           command: |
+            sleep 60  # Wait for initialization after deployment.
             curl https://$GOOGLE_PROJECT_ID.appspot.com/spanner | tee $HOME/output.html
             grep -q "All done!" $HOME/output.html
 
